@@ -14,7 +14,7 @@ build:
     only:
     - master
 
-k8s-deploy:
+k8s-trigger:
     image: google/cloud-sdk
     stage: deploy
     script:
@@ -24,6 +24,7 @@ k8s-deploy:
     - gcloud config set project hello-world-392
     - gcloud config set container/use_client_certificate True
     - gcloud container clusters get-credentials main
+    - sed "s/BUILD_NUMBER/${CI_PIPELINE_ID}/g" deployment.yaml | kubectl delete -f -
     - sed "s/BUILD_NUMBER/${CI_PIPELINE_ID}/g" deployment.yaml | kubectl apply -f -
     only:
-    - master
+    - cron-triggered
