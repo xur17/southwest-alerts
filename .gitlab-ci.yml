@@ -7,7 +7,8 @@ build:
     stage: build
     script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-    - docker build -t registry.gitlab.com/tdickman/southwest-alerts:build$CI_PIPELINE_ID -t registry.gitlab.com/tdickman/southwest-alerts:latest .
+    - docker pull registry.gitlab.com/tdickman/southwest-alerts:latest
+    - docker build --cache-from registry.gitlab.com/tdickman/southwest-alerts:latest -t registry.gitlab.com/tdickman/southwest-alerts:build$CI_PIPELINE_ID -t registry.gitlab.com/tdickman/southwest-alerts:latest .
     - docker push registry.gitlab.com/tdickman/southwest-alerts:build$CI_PIPELINE_ID
     - docker push registry.gitlab.com/tdickman/southwest-alerts:latest
     only:
