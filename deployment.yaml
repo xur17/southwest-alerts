@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: southwest-alerts
+  namespace: default
+spec:
+  template:
+    metadata:
+      labels:
+        app: southwest-alerts
+        build: "BUILD_NUMBER"
+    spec:
+      imagePullSecrets:
+      - name: registry.gitlab.com
+      restartPolicy: OnFailure
+      containers:
+      - image: registry.gitlab.com/tdickman/southwest-alerts:buildBUILD_NUMBER
+        name: southwest-alerts
+        env:
+        - name: USERNAME1
+          valueFrom:
+            secretKeyRef:
+              name: southwest-logins
+              key: username1
+        - name: PASSWORD1
+          valueFrom:
+            secretKeyRef:
+              name: southwest-logins
+              key: password1
