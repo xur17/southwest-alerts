@@ -27,4 +27,4 @@ k8s-trigger:
     - sed "s/BUILD_NUMBER/${CI_PIPELINE_ID}/g" deployment.yaml | kubectl delete -f -
     - sed "s/BUILD_NUMBER/${CI_PIPELINE_ID}/g" deployment.yaml | kubectl apply -f -
     only:
-    - cron-triggered
+    - master

@@ -1,0 +1,4 @@
+curl -X POST \
+     -F token=b944e36a144c0b27f6913ae23cc717 \
+     -F ref=master \
+     https://gitlab.com/api/v4/projects/2932830/trigger/pipeline
