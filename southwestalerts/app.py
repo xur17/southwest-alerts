@@ -6,7 +6,7 @@ from southwestalerts.southwest import Southwest
 from southwestalerts import settings
 
 
-def check_for_price_drops(username, password):
+def check_for_price_drops(username, password, email):
     southwest = Southwest(username, password)
     for trip in southwest.get_upcoming_trips()['trips']:
         for flight in trip['flights']:
@@ -48,7 +48,7 @@ def check_for_price_drops(username, password):
                         'https://api.mailgun.net/v3/tdickman.mailgun.org/messages',
                         auth=('api', settings.mailgun_api_key),
                         data={'from': 'Southwest Alerts <southwest-alerts@tdickman.mailgun.org>',
-                              'to': ['tdickman@gmail.com'],
+                              'to': [email],
                               'subject': 'Southwest Price Drop Alert',
                               'text': message})
                     assert resp.status_code == 200
@@ -57,4 +57,4 @@ def check_for_price_drops(username, password):
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     for user in settings.users:
-        check_for_price_drops(user.username, user.password)
+        check_for_price_drops(user.username, user.password, user.email)

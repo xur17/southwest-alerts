@@ -27,6 +27,11 @@ spec:
             secretKeyRef:
               name: southwest-logins
               key: password1
+        - name: EMAIL1
+          valueFrom:
+            secretKeyRef:
+              name: southwest-logins
+              key: email1
         - name: MAILGUN_API_KEY
           valueFrom:
             secretKeyRef:
