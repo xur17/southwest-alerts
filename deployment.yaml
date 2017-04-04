@@ -1,39 +1,39 @@
-apiVersion: batch/v1
-kind: Job
+apiVersion: epicconstructions.com/v1alpha1
+kind: CronJob
 metadata:
   name: southwest-alerts
   namespace: default
+  build: "BUILD_NUMBER"
 spec:
-  template:
-    metadata:
-      labels:
-        app: southwest-alerts
-        build: "BUILD_NUMBER"
+  schedule: "*/5 * * * *"
+  jobTemplate:
     spec:
-      imagePullSecrets:
-      - name: registry.gitlab.com
-      restartPolicy: OnFailure
-      containers:
-      - image: registry.gitlab.com/tdickman/southwest-alerts:buildBUILD_NUMBER
-        name: southwest-alerts
-        env:
-        - name: USERNAME1
-          valueFrom:
-            secretKeyRef:
-              name: southwest-logins
-              key: username1
-        - name: PASSWORD1
-          valueFrom:
-            secretKeyRef:
-              name: southwest-logins
-              key: password1
-        - name: EMAIL1
-          valueFrom:
-            secretKeyRef:
-              name: southwest-logins
-              key: email1
-        - name: MAILGUN_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: southwest-logins
-              key: mailgun_api_key
+      template:
+        spec:
+          imagePullSecrets:
+          - name: registry.gitlab.com
+          restartPolicy: OnFailure
+          containers:
+          - image: registry.gitlab.com/tdickman/southwest-alerts:buildBUILD_NUMBER
+            name: southwest-alerts
+            env:
+            - name: USERNAME1
+              valueFrom:
+                secretKeyRef:
+                  name: southwest-logins
+                  key: username1
+            - name: PASSWORD1
+              valueFrom:
+                secretKeyRef:
+                  name: southwest-logins
+                  key: password1
+            - name: EMAIL1
+              valueFrom:
+                secretKeyRef:
+                  name: southwest-logins
+                  key: email1
+            - name: MAILGUN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: southwest-logins
+                  key: mailgun_api_key

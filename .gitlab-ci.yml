@@ -25,6 +25,6 @@ k8s-trigger:
     - gcloud config set container/use_client_certificate True
     - gcloud container clusters get-credentials main
     - sed "s/BUILD_NUMBER/${CI_PIPELINE_ID}/g" deployment.yaml | kubectl delete --ignore-not-found -f -
-    - sed "s/BUILD_NUMBER/${CI_PIPELINE_ID}/g" deployment.yaml | kubectl apply -f -
+    - sed "s/BUILD_NUMBER/${CI_PIPELINE_ID}/g" deployment.yaml | kubectl create -f -
     only:
     - master
