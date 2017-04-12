@@ -5,7 +5,7 @@ metadata:
   namespace: default
   build: "BUILD_NUMBER"
 spec:
-  schedule: "5 9 * * *"
+  schedule: "5 14 * * *"
   jobTemplate:
     spec:
       template:
