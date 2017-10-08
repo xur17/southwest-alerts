@@ -14,18 +14,18 @@ account to be able to receive the email notifications.
 1. Install docker
    ([ubuntu](https://docs.docker.com/engine/installation/linux/ubuntu/#install-using-the-repository),
 [windows](https://docs.docker.com/docker-for-windows/install/),
-[osx](https://docs.docker.com/docker-for-mac/install/)
+[osx](https://docs.docker.com/docker-for-mac/install/))
 
-2. Pull docker image
+2. Create mailgun account
+
+Setup a [mailgun account](https://www.mailgun.com/), and create an [api
+key](https://app.mailgun.com/app/account/security). Use the default mailgun
+domain (username.mailgun.org), or create a new one for the next step.
+
+3. Run docker image (replacing everything on the right side of the equal sign with your values). You can add additional username#, password#, email# values as needed for additional southwest accounts.
 
 ```
-docker pull xur17/southwest-alerts
-```
-
-3. Run docker image (replacing everything on the right side of the equal sign with your value. You can add additional username#, password#, email# values as needed for additional southwest accounts.
-
-```
-docker run -e MAILGUN_API_KEY=??? -e USERNAME1=SOUTHWEST_USERNAME -e PASSWORD1=SOUTHWEST_PASSWORD -e EMAIL1=NOTIFICATION_EMAIL xur17/southwest-alerts
+docker run -e MAILGUN_DOMAIN=??? -e MAILGUN_API_KEY=??? -e USERNAME1=SOUTHWEST_USERNAME -e PASSWORD1=SOUTHWEST_PASSWORD -e EMAIL1=NOTIFICATION_EMAIL xur17/southwest-alerts
 ```
 
 ## Option 2 - Run natively
@@ -33,7 +33,7 @@ docker run -e MAILGUN_API_KEY=??? -e USERNAME1=SOUTHWEST_USERNAME -e PASSWORD1=S
 1. Pull repository
 
 ```
-git pull xur17/southwest-alerts
+git clone xur17/southwest-alerts
 cd southwest-alerts
 ```
 
@@ -46,6 +46,7 @@ pip3 install -r requirements.txt
 3. Set environment variables (replacing value with the appropriate value)
 
 ```
+export MAILGUN_DOMAIN=VALUE
 export MAILGUN_API_KEY=VALUE
 export USERNAME1=VALUE
 export PASSWORD1=VALUE

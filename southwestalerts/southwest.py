@@ -45,6 +45,22 @@ class Southwest(object):
         )
         return self._session.get(url)
 
+    def get_cancellation_details(self, record_locator, first_name, last_name):
+        url = '/api/reservations-api/v1/air-reservations/reservations/record-locator/{record_locator}?first-name={first_name}&last-name={last_name}&action=CANCEL'.format(
+            record_locator=record_locator,
+            first_name=first_name,
+            last_name=last_name
+        )
+        return self._session.get(url)
+
+    def get_available_flights(self, departure_date, origin_airport, destination_airport, currency='Points'):
+        url = '/api/extensions/v1/mobile/flights/products?origination-airport={origin_airport}&destination-airport={destination_airport}&departure-date={departure_date}&departure-date2=&number-adult-passengers=1&number-senior-passengers=0&promo-code=&currency-type=Points'.format(
+            origin_airport=origin_airport,
+            destination_airport=destination_airport,
+            departure_date=departure_date
+        )
+        return self._session.get(url)
+
 
 class _SouthwestSession():
     def __init__(self, username, password):

@@ -14,7 +14,7 @@ spec:
           - name: registry.gitlab.com
           restartPolicy: OnFailure
           containers:
-          - image: registry.gitlab.com/tdickman/southwest-alerts:buildBUILD_NUMBER
+          - image: xur17/southwest-alerts:latest
             name: southwest-alerts
             env:
             - name: USERNAME1

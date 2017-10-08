@@ -12,18 +12,18 @@ def check_for_price_drops(username, password, email):
         for flight in trip['flights']:
             passenger = flight['passengers'][0]
             record_locator = flight['recordLocator']
-            itinerary = southwest.start_change_flight(record_locator, passenger['firstName'], passenger['lastName'])['itinerary']
-            for originination_destination in itinerary['originationDestinations']:
-                departure_datetime = originination_destination['segments'][0]['departureDateTime'].split('.000')[0][:-3]
+            cancellation_details = southwest.get_cancellation_details(record_locator, passenger['firstName'], passenger['lastName'])
+            itinerary_price = cancellation_details['pointsRefund']['amountPoints']
+            # Calculate total for all of the legs of the flight
+            matching_flights_price = 0
+            for origination_destination in cancellation_details['itinerary']['originationDestinations']:
+                departure_datetime = origination_destination['segments'][0]['departureDateTime'].split('.000')[0][:-3]
                 departure_date = departure_datetime.split('T')[0]
-                arrival_datetime = originination_destination['segments'][-1]['arrivalDateTime'].split('.000')[0][:-3]
+                arrival_datetime = origination_destination['segments'][-1]['arrivalDateTime'].split('.000')[0][:-3]
 
-                origin_airport = originination_destination['segments'][0]['originationAirportCode']
-                destination_airport = originination_destination['segments'][-1]['destinationAirportCode']
-                available = southwest.get_available_change_flights(
-                    record_locator,
-                    passenger['firstName'],
-                    passenger['lastName'],
+                origin_airport = origination_destination['segments'][0]['originationAirportCode']
+                destination_airport = origination_destination['segments'][-1]['destinationAirportCode']
+                available = southwest.get_available_flights(
                     departure_date,
                     origin_airport,
                     destination_airport
@@ -31,27 +31,30 @@ def check_for_price_drops(username, password, email):
 
                 # Find that the flight that matches the purchased flight
                 matching_flight = next(f for f in available['trips'][0]['airProducts'] if f['segments'][0]['departureDateTime'] == departure_datetime and f['segments'][-1]['arrivalDateTime'] == arrival_datetime)
-                product_id = matching_flight['fareProducts'][-1]['productId']
-                refund_details = southwest.get_price_change_flight(record_locator, passenger['firstName'], passenger['lastName'], product_id)['pointsDifference']
-                message = '{base_message} points detected for flight {record_locator} from {origin_airport} to {destination_airport} on {departure_date}'.format(
-                    base_message='Price drop of {}'.format(refund_details['refundAmount']) if refund_details['refundAmount'] > 0 else 'Price increase of {}'.format(refund_details['amountDue']),
-                    refund_amount=refund_details['refundAmount'],
-                    record_locator=record_locator,
-                    origin_airport=origin_airport,
-                    destination_airport=destination_airport,
-                    departure_date=departure_date,
-                )
-                logging.info(message)
-                if refund_details['refundAmount'] > 0:
-                    logging.info('Sending email for price drop')
-                    resp = requests.post(
-                        'https://api.mailgun.net/v3/tdickman.mailgun.org/messages',
-                        auth=('api', settings.mailgun_api_key),
-                        data={'from': 'Southwest Alerts <southwest-alerts@tdickman.mailgun.org>',
-                              'to': [email],
-                              'subject': 'Southwest Price Drop Alert',
-                              'text': message})
-                    assert resp.status_code == 200
+                matching_flight_price = matching_flight['fareProducts'][-1]['pointsPrice']['discountedRedemptionPoints']
+                matching_flights_price += matching_flight_price
+
+            # Calculate refund details (current flight price - sum(current price of all legs), and print log message
+            refund_amount = itinerary_price - matching_flights_price
+            message = '{base_message} points detected for flight {record_locator} from {origin_airport} to {destination_airport} on {departure_date}'.format(
+                base_message='Price drop of {}'.format(refund_amount) if refund_amount > 0 else 'Price increase of {}'.format(refund_amount * -1),
+                refund_amount=refund_amount,
+                record_locator=record_locator,
+                origin_airport=origin_airport,
+                destination_airport=destination_airport,
+                departure_date=departure_date
+            )
+            logging.info(message)
+            if refund_amount > 0:
+                logging.info('Sending email for price drop')
+                resp = requests.post(
+                    'https://api.mailgun.net/v3/{}/messages'.format(settings.mailgun_domain),
+                    auth=('api', settings.mailgun_api_key),
+                    data={'from': 'Southwest Alerts <southwest-alerts@{}>'.format(settings.mailgun_domain),
+                          'to': [email],
+                          'subject': 'Southwest Price Drop Alert',
+                          'text': message})
+                assert resp.status_code == 200
 
 
 if __name__ == '__main__':
