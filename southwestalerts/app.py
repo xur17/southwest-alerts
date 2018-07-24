@@ -36,8 +36,12 @@ def check_for_price_drops(username, password, email):
 
             # Calculate refund details (current flight price - sum(current price of all legs), and print log message
             refund_amount = itinerary_price - matching_flights_price
+            if matching_flights_price == 0:
+                base_message='(unavailable) 0'
+            else:
+                base_message='Price drop of {}'.format(refund_amount) if refund_amount > 0 else 'Price increase of {}'.format(refund_amount * -1)
             message = '{base_message} points detected for flight {record_locator} from {origin_airport} to {destination_airport} on {departure_date}'.format(
-                base_message='Price drop of {}'.format(refund_amount) if refund_amount > 0 else 'Price increase of {}'.format(refund_amount * -1),
+                base_message=base_message,
                 refund_amount=refund_amount,
                 record_locator=record_locator,
                 origin_airport=origin_airport,
@@ -45,7 +49,7 @@ def check_for_price_drops(username, password, email):
                 departure_date=departure_date
             )
             logging.info(message)
-            if refund_amount > 0:
+            if matching_flights_price > 0 and refund_amount > 0:
                 logging.info('Sending email for price drop')
                 resp = requests.post(
                     'https://api.mailgun.net/v3/{}/messages'.format(settings.mailgun_domain),
