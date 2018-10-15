@@ -1,3 +1,5 @@
+import locale
+locale.resetlocale()
 import logging
 import requests
 import sys
