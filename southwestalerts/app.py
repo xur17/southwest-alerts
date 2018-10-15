@@ -17,7 +17,7 @@ def check_for_price_drops(username, password, email):
             try:
                 cancellation_details = southwest.get_cancellation_details(record_locator, passenger['firstName'], passenger['lastName'])
                 itinerary_price = cancellation_details['pointsRefund']['amountPoints']
-                itinerary_price = itinerary_price/len(cancellation_details['passengers']) # support multi-passenger itineraries
+                itinerary_price = int(itinerary_price/len(cancellation_details['passengers'])) # support multi-passenger itineraries
             except:
                 print("Caught error from revenue or international trip")
                 continue
