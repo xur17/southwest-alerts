@@ -54,7 +54,7 @@ class Southwest(object):
         return self._session.get(url)
 
     def get_available_flights(self, departure_date, origin_airport, destination_airport, currency='Points'):
-        url = '/api/extensions/v1/mobile/flights/products?origination-airport={origin_airport}&destination-airport={destination_airport}&departure-date={departure_date}&departure-date2=&number-adult-passengers=1&number-senior-passengers=0&promo-code=&currency-type=Points'.format(
+        url = '/api/mobile-air-booking/v1/mobile-air-booking/page/flights/products?origination-airport={origin_airport}&destination-airport={destination_airport}&departure-date={departure_date}&number-adult-passengers=1&number-senior-passengers=0&currency=PTS'.format(
             origin_airport=origin_airport,
             destination_airport=destination_airport,
             departure_date=departure_date
