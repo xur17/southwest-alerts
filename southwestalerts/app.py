@@ -40,7 +40,7 @@ def check_for_price_drops(username, password, email):
 
                 # Find that the flight that matches the purchased flight
                 matching_flight = next(f for f in available['flightShoppingPage']['outboundPage']['cards'] if f['departureTime'] == departure_time and f['arrivalTime'] == arrival_time)
-                # Check to make sure the flight isnt sold out to avoid null nonscriptable error
+                # Check to make sure the flight isnt sold out to avoid NoneType object is not subscriptable error
                 if matching_flight['fares'][0]['price'] is None:
                     print("sold out")
                     matching_flight_price = 0
