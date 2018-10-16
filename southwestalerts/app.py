@@ -1,3 +1,5 @@
+import locale
+locale.resetlocale()
 import logging
 import requests
 import sys
@@ -15,7 +17,7 @@ def check_for_price_drops(username, password, email):
             try:
                 cancellation_details = southwest.get_cancellation_details(record_locator, passenger['firstName'], passenger['lastName'])
                 itinerary_price = cancellation_details['pointsRefund']['amountPoints']
-                itinerary_price = itinerary_price/len(cancellation_details['passengers']) # support multi-passenger itineraries
+                itinerary_price = int(itinerary_price/len(cancellation_details['passengers'])) # support multi-passenger itineraries
             except:
                 print("Caught error from revenue or international trip")
                 continue
@@ -24,7 +26,9 @@ def check_for_price_drops(username, password, email):
             for origination_destination in cancellation_details['itinerary']['originationDestinations']:
                 departure_datetime = origination_destination['segments'][0]['departureDateTime'].split('.000')[0][:-3]
                 departure_date = departure_datetime.split('T')[0]
+                departure_time = departure_datetime.split('T')[1]
                 arrival_datetime = origination_destination['segments'][-1]['arrivalDateTime'].split('.000')[0][:-3]
+                arrival_time = arrival_datetime.split('T')[1]
 
                 origin_airport = origination_destination['segments'][0]['originationAirportCode']
                 destination_airport = origination_destination['segments'][-1]['destinationAirportCode']
@@ -35,8 +39,8 @@ def check_for_price_drops(username, password, email):
                 )
 
                 # Find that the flight that matches the purchased flight
-                matching_flight = next(f for f in available['trips'][0]['airProducts'] if f['segments'][0]['departureDateTime'] == departure_datetime and f['segments'][-1]['arrivalDateTime'] == arrival_datetime)
-                matching_flight_price = matching_flight['fareProducts'][-1]['pointsPrice']['discountedRedemptionPoints']
+                matching_flight = next(f for f in available['flightShoppingPage']['outboundPage']['cards'] if f['departureTime'] == departure_time and f['arrivalTime'] == arrival_time)
+                matching_flight_price = locale.atoi(matching_flight['fares'][0]['price']['amount'])
                 matching_flights_price += matching_flight_price
 
             # Calculate refund details (current flight price - sum(current price of all legs), and print log message
