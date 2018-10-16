@@ -40,7 +40,13 @@ def check_for_price_drops(username, password, email):
 
                 # Find that the flight that matches the purchased flight
                 matching_flight = next(f for f in available['flightShoppingPage']['outboundPage']['cards'] if f['departureTime'] == departure_time and f['arrivalTime'] == arrival_time)
-                matching_flight_price = locale.atoi(matching_flight['fares'][0]['price']['amount'])
+                # Check to make sure the flight isnt sold out to avoid NoneType object is not subscriptable error
+                if matching_flight['fares'][0]['price'] is None:
+                    print("sold out")
+                    matching_flight_price = 0
+                else:
+                    matching_flight_price = locale.atoi(matching_flight['fares'][0]['price']['amount'])
+                    
                 matching_flights_price += matching_flight_price
 
             # Calculate refund details (current flight price - sum(current price of all legs), and print log message
