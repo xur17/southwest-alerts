@@ -44,6 +44,9 @@ def check_for_price_drops(username, password, email):
                 if matching_flight['fares'] is None:
                     print("sold out")
                     matching_flight_price = 0
+                elif matching_flight['fares'][0]['price'] is None:
+                    print("sold out")
+                    matching_flight_price = 0
                 else:
                     matching_flight_price = locale.atoi(matching_flight['fares'][0]['price']['amount'])
                     
@@ -55,13 +58,15 @@ def check_for_price_drops(username, password, email):
                 base_message='(unavailable) 0'
             else:
                 base_message='Price drop of {}'.format(refund_amount) if refund_amount > 0 else 'Price increase of {}'.format(refund_amount * -1)
-            message = '{base_message} points detected for flight {record_locator} from {origin_airport} to {destination_airport} on {departure_date}'.format(
+            message = '{base_message} points detected for flight {record_locator} from {origin_airport} to {destination_airport} on {departure_date} departing at {departure_time} and arriving at {arrival_time}'.format(
                 base_message=base_message,
                 refund_amount=refund_amount,
                 record_locator=record_locator,
                 origin_airport=origin_airport,
                 destination_airport=destination_airport,
-                departure_date=departure_date
+                departure_date=departure_date,
+                departure_time=departure_time,
+                arrival_time=arrival_time
             )
             logging.info(message)
             if matching_flights_price > 0 and refund_amount > 0:
