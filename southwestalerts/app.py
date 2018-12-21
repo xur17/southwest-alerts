@@ -23,6 +23,7 @@ def check_for_price_drops(username, password, email):
                 continue
             # Calculate total for all of the legs of the flight
             matching_flights_price = 0
+            logging.info('itinerary original total price: %s',itinerary_price)
             for origination_destination in cancellation_details['itinerary']['originationDestinations']:
                 departure_datetime = origination_destination['segments'][0]['departureDateTime'].split('.000')[0][:-3]
                 departure_date = departure_datetime.split('T')[0]
@@ -40,12 +41,16 @@ def check_for_price_drops(username, password, email):
 
                 # Find that the flight that matches the purchased flight
                 matching_flight = next(f for f in available['flightShoppingPage']['outboundPage']['cards'] if f['departureTime'] == departure_time and f['arrivalTime'] == arrival_time)
-                # Check to make sure the flight isnt sold out to avoid NoneType object is not subscriptable error
-                if matching_flight['fares'][0]['price'] is None:
-                    print("sold out")
-                    matching_flight_price = 0
-                else:
-                    matching_flight_price = locale.atoi(matching_flight['fares'][0]['price']['amount'])
+                for faretype,fare in enumerate(matching_flight['fares']):
+                        logging.info('current leg faretype %d price: %s',faretype,fare['price'])
+                        # Check to make sure the flight isnt sold out to avoid NoneType object is not subscriptable error
+                        if fare['price'] is None:
+                            logging.info("fare type %d is sold out",faretype)
+                            #if fare type is sold out, then use next rate for calculations, so let this for loop continue
+                        else:
+                            matching_flight_price = locale.atoi(matching_flight['fares'][faretype]['price']['amount'])
+                            #if fare type isn't sold out, then set the price and break out of the faretype loop.
+                            break
                     
                 matching_flights_price += matching_flight_price
 
