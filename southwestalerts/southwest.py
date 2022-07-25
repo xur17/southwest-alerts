@@ -2,7 +2,7 @@ import json
 import requests
 
 
-API_KEY = 'l7xx12ebcbc825eb480faa276e7f192d98d1'  # TODO: Retrieve this from https://mobile.southwest.com/js/config.js
+API_KEY = 'l7xx2c186c1297274b828b1872e22edfe67a'  # TODO: Retrieve this from https://mobile.southwest.com/js/config.js        
 BASE_URL = 'https://mobile.southwest.com'
 
 
